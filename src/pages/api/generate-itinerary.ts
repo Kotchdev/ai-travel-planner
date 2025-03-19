@@ -23,13 +23,47 @@ export default async function handler(
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    if (!interests.length) {
+      return res
+        .status(400)
+        .json({ error: "At least one interest is required" });
+    }
+
+    // Log the request for troubleshooting on Vercel
+    console.log("Generating itinerary for:", {
+      destination,
+      dates: `${startDate} to ${endDate}`,
+      budget,
+      interests: interests.join(", "),
+    });
+
     // Generate itinerary
     const itinerary = await generateItinerary(itineraryInput);
+
+    // Validate the returned itinerary
+    if (!itinerary.destination || itinerary.destination === "Unknown") {
+      console.warn("Generated itinerary may be incomplete:", itinerary);
+    }
 
     // Return the generated itinerary
     return res.status(200).json(itinerary);
   } catch (error) {
-    console.error("Error in generate-itinerary API:", error);
-    return res.status(500).json({ error: "Failed to generate itinerary" });
+    const errorMessage =
+      error instanceof Error ? error.message : "An unknown error occurred";
+    console.error("Error in generate-itinerary API:", errorMessage);
+
+    // Check if the error is related to the API key
+    if (
+      errorMessage.includes("API key") ||
+      errorMessage.includes("authentication") ||
+      errorMessage.includes("unauthorized")
+    ) {
+      return res.status(500).json({
+        error:
+          "API authentication error. Please check your DeepSeek API key configuration.",
+      });
+    }
+
+    return res.status(500).json({ error: errorMessage });
   }
 }

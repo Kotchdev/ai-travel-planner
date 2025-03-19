@@ -22,7 +22,7 @@ BUDGET: ${budget}
 INTERESTS: ${interestsText}
 
 Please create a comprehensive travel itinerary with the following:
-1. A brief overview of the destination
+1. A brief overview of the destination (2-3 sentences)
 2. Day-by-day activities, including:
    - Attractions to visit
    - Estimated time for each activity
@@ -31,63 +31,75 @@ Please create a comprehensive travel itinerary with the following:
 3. Practical travel tips for the destination
 4. Budget considerations
 
-Format the response as a structured itinerary that can be parsed as JSON.`;
+The response MUST be in valid JSON format with this structure:
+{
+  "destination": "City, Country",
+  "startDate": "YYYY-MM-DD",
+  "endDate": "YYYY-MM-DD",
+  "overview": "Brief overview of the destination",
+  "days": [
+    {
+      "day": 1,
+      "date": "YYYY-MM-DD",
+      "activities": [
+        {
+          "name": "Activity name",
+          "description": "Brief description",
+          "estimatedTime": "X hours",
+          "cost": "Cost in local currency or USD",
+          "location": "Location within the city"
+        }
+      ]
+    }
+  ],
+  "budget": "Budget considerations",
+  "tips": ["Tip 1", "Tip 2", "Tip 3"]
+}`;
 }
 
 // Process the response from DeepSeek API
 export function processResponse(response: string): Itinerary {
   try {
-    // Try to parse as JSON first
+    // Look for JSON content within the response
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
+    }
+
+    // If no JSON found, try to parse the full response
     return JSON.parse(response);
   } catch (error) {
-    // If not valid JSON, extract structured data manually
-    // This is a simplified parsing logic - you might need to enhance it
+    console.error("Error parsing response:", error);
+    console.log("Raw response:", response);
+
+    // If JSON parsing fails, create a basic structure
+    const fallbackItinerary: Itinerary = {
+      destination: "Unknown",
+      startDate: "Unknown",
+      endDate: "Unknown",
+      days: [],
+      budget: "Information not available",
+      overview:
+        "We couldn't generate a proper itinerary. Please try again with different parameters.",
+      tips: [
+        "Try selecting different interests",
+        "Consider a different destination or date range",
+      ],
+    };
+
+    // Try to extract some information if possible
     const lines = response.split("\n");
 
-    // Extract destination and dates (simplified)
-    const destination =
-      lines
-        .find((line) => line.includes("DESTINATION"))
-        ?.split(":")[1]
-        ?.trim() || "Unknown";
-    const dateInfo =
-      lines
-        .find((line) => line.includes("DATES"))
-        ?.split(":")[1]
-        ?.trim() || "";
-    const [startDate, endDate] = dateInfo.split("to").map((d) => d.trim());
+    // Extract destination if possible
+    const destinationLine = lines.find(
+      (line) => line.includes("DESTINATION") || line.includes("destination")
+    );
+    if (destinationLine) {
+      const match = destinationLine.match(/:\s*(.*)/);
+      if (match) fallbackItinerary.destination = match[1].trim();
+    }
 
-    // Extract budget
-    const budget =
-      lines
-        .find((line) => line.includes("BUDGET"))
-        ?.split(":")[1]
-        ?.trim() || "Unknown";
-
-    // Extract overview (simplified)
-    const overviewIndex = lines.findIndex((line) => line.includes("Overview"));
-    const overview =
-      overviewIndex >= 0 ? lines[overviewIndex + 1] : "No overview provided";
-
-    // Simple extraction of tips
-    const tipsSection = response.split("Tips:")[1] || "";
-    const tips = tipsSection
-      .split("\n")
-      .filter(
-        (line) => line.trim().startsWith("-") || line.trim().startsWith("*")
-      )
-      .map((tip) => tip.replace(/^[-*]\s*/, "").trim());
-
-    // Create a basic structure - this would need refinement
-    return {
-      destination,
-      startDate: startDate || "Unknown",
-      endDate: endDate || "Unknown",
-      days: [], // Would need more complex parsing
-      budget,
-      overview,
-      tips: tips.length ? tips : ["No specific tips provided"],
-    };
+    return fallbackItinerary;
   }
 }
 
@@ -106,15 +118,16 @@ export async function generateItinerary(
           {
             role: "system",
             content:
-              "You are a travel planning assistant that helps create detailed itineraries. Respond with well-structured, detailed travel plans that include daily activities, costs, and practical tips.",
+              "You are a travel planning assistant that helps create detailed itineraries. ALWAYS respond with VALID JSON only, no other text. The JSON must match the structure shown in the user's prompt.",
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.7,
+        temperature: 0.5,
         max_tokens: 2000,
+        response_format: { type: "json_object" },
       },
       {
         headers: {
@@ -131,6 +144,14 @@ export async function generateItinerary(
     return processResponse(generatedText);
   } catch (error) {
     console.error("Error generating itinerary:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("API Response:", error.response.data);
+      throw new Error(
+        `API Error: ${error.response.data.error?.message || error.message}`
+      );
+    }
+
     throw new Error("Failed to generate itinerary. Please try again later.");
   }
 }
