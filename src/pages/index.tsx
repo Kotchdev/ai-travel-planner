@@ -50,7 +50,10 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <header className="bg-primary-600 text-white shadow-md">
+      <header
+        style={{ backgroundColor: "var(--primary-600)", color: "white" }}
+        className="shadow-md"
+      >
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold">AI Travel Planner</h1>
         </div>
@@ -67,10 +70,11 @@ export default function HomePage() {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <svg
-                    className="animate-spin h-10 w-10 text-primary-600 mx-auto mb-4"
+                    className="animate-spin h-10 w-10 mx-auto mb-4"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
+                    style={{ color: "var(--primary-600)" }}
                   >
                     <circle
                       className="opacity-25"
@@ -130,10 +134,11 @@ export default function HomePage() {
                 <div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 text-primary-500 mx-auto mb-4"
+                    className="h-12 w-12 mx-auto mb-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    style={{ color: "var(--primary-500)" }}
                   >
                     <path
                       strokeLinecap="round"

@@ -103,55 +103,87 @@ export function processResponse(response: string): Itinerary {
   }
 }
 
-// Call DeepSeek API to generate an itinerary
+// Create a much simpler placeholder response
 export async function generateItinerary(
   input: ItineraryInput
 ): Promise<Itinerary> {
-  const prompt = generatePrompt(input);
+  const { destination, startDate, endDate, budget, interests } = input;
 
-  try {
-    const response = await axios.post(
-      "https://api.deepseek.com/v1/chat/completions",
+  // Create a placeholder itinerary without calling the API
+  const placeholderItinerary: Itinerary = {
+    destination: destination,
+    startDate: startDate,
+    endDate: endDate,
+    budget: `${budget} range`,
+    overview: `${destination} is a wonderful place to visit, especially for travelers interested in ${interests.join(
+      ", "
+    )}. The city offers a perfect blend of culture, history, and modern attractions.`,
+    days: [
       {
-        model: "deepseek-chat",
-        messages: [
+        day: 1,
+        date: startDate,
+        activities: [
           {
-            role: "system",
-            content:
-              "You are a travel planning assistant that helps create detailed itineraries. ALWAYS respond with VALID JSON only, no other text. The JSON must match the structure shown in the user's prompt.",
+            name: "Morning City Tour",
+            description: `Explore the historic center of ${destination}`,
+            estimatedTime: "3 hours",
+            cost: "Free - $30",
+            location: "City Center",
           },
           {
-            role: "user",
-            content: prompt,
+            name: "Local Cuisine Experience",
+            description: "Try the famous local dishes for lunch",
+            estimatedTime: "1.5 hours",
+            cost: "$20 - $40",
+            location: "Old Town District",
+          },
+          {
+            name: "Museum Visit",
+            description: `Visit the main ${destination} museum`,
+            estimatedTime: "2 hours",
+            cost: "$15",
+            location: "Museum District",
           },
         ],
-        temperature: 0.5,
-        max_tokens: 2000,
-        response_format: { type: "json_object" },
       },
       {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-        },
-      }
-    );
+        day: 2,
+        date: endDate,
+        activities: [
+          {
+            name: "Nature Excursion",
+            description: `Explore the natural beauty around ${destination}`,
+            estimatedTime: "4 hours",
+            cost: "$25 - $50",
+            location: "Outside City Center",
+          },
+          {
+            name: "Shopping Time",
+            description: "Visit local markets and shops",
+            estimatedTime: "2 hours",
+            cost: "Varies",
+            location: "Shopping District",
+          },
+          {
+            name: "Farewell Dinner",
+            description: "Enjoy a nice dinner at a recommended restaurant",
+            estimatedTime: "2 hours",
+            cost: "$30 - $60",
+            location: "Riverside Area",
+          },
+        ],
+      },
+    ],
+    tips: [
+      `The best time to visit attractions in ${destination} is early morning to avoid crowds.`,
+      "Always carry some cash as not all places accept credit cards.",
+      "Public transportation is reliable and a cost-effective way to get around.",
+      `If you're interested in ${interests[0]}, make sure to check local event calendars for special exhibitions.`,
+    ],
+  };
 
-    // Extract the response from DeepSeek API
-    const generatedText = response.data.choices[0].message.content;
+  // Simulate a delay to make it feel like it's fetching data
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    // Process and structure the response
-    return processResponse(generatedText);
-  } catch (error) {
-    console.error("Error generating itinerary:", error);
-
-    if (axios.isAxiosError(error) && error.response) {
-      console.error("API Response:", error.response.data);
-      throw new Error(
-        `API Error: ${error.response.data.error?.message || error.message}`
-      );
-    }
-
-    throw new Error("Failed to generate itinerary. Please try again later.");
-  }
+  return placeholderItinerary;
 }

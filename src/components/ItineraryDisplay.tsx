@@ -7,13 +7,23 @@ interface ItineraryDisplayProps {
 }
 
 const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
+  const headerStyle = {
+    backgroundColor: "var(--primary-600)",
+    color: "white",
+    padding: "1rem 1.5rem",
+  };
+
+  const textLightStyle = {
+    color: "var(--primary-100)",
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-primary-600 px-6 py-4">
-        <h2 className="text-2xl font-bold text-white">
+      <div style={headerStyle}>
+        <h2 className="text-2xl font-bold">
           {itinerary.destination} Itinerary
         </h2>
-        <p className="text-primary-100">
+        <p style={textLightStyle}>
           {itinerary.startDate} to {itinerary.endDate}
         </p>
       </div>

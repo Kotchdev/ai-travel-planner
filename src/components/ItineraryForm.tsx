@@ -64,6 +64,20 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
     onSubmit(formData);
   };
 
+  const buttonStyle = {
+    width: "100%",
+    padding: "0.5rem 1rem",
+    borderRadius: "0.375rem",
+    fontWeight: 500,
+    backgroundColor:
+      isLoading || formData.interests.length === 0 ? "#93c5fd" : "#0284c7",
+    color: "white",
+    border: "none",
+    cursor:
+      isLoading || formData.interests.length === 0 ? "not-allowed" : "pointer",
+    opacity: isLoading || formData.interests.length === 0 ? 0.5 : 1,
+  };
+
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Plan Your Trip</h2>
@@ -176,11 +190,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
         <button
           type="submit"
           disabled={isLoading || formData.interests.length === 0}
-          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
-            isLoading || formData.interests.length === 0
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
+          style={buttonStyle}
         >
           {isLoading ? "Generating Itinerary..." : "Generate Itinerary"}
         </button>
