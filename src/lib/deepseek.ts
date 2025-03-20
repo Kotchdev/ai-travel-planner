@@ -103,13 +103,87 @@ export function processResponse(response: string): Itinerary {
   }
 }
 
-// Create a much simpler placeholder response
+// Main function to call DeepSeek API and generate itinerary
 export async function generateItinerary(
+  input: ItineraryInput
+): Promise<Itinerary> {
+  // First, try to use DeepSeek API
+  try {
+    const prompt = generatePrompt(input);
+
+    // Check if the DEEPSEEK_API_KEY is available
+    if (!process.env.DEEPSEEK_API_KEY) {
+      console.warn("DEEPSEEK_API_KEY is not defined, using fallback generator");
+      return generateFallbackItinerary(input);
+    }
+
+    const response = await axios.post(
+      "https://api.deepseek.com/v1/chat/completions",
+      {
+        model: "deepseek-chat",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a travel planning assistant that helps create detailed itineraries. ALWAYS respond with VALID JSON only, no other text. The JSON must match the structure shown in the user's prompt.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.5,
+        max_tokens: 2000,
+        response_format: { type: "json_object" },
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+        },
+        timeout: 30000, // 30 second timeout
+      }
+    );
+
+    // Extract the response from DeepSeek API
+    const generatedText = response.data.choices[0].message.content;
+    console.log("Successful response from DeepSeek API");
+
+    // Process and structure the response
+    return processResponse(generatedText);
+  } catch (error) {
+    console.error("Error calling DeepSeek API:", error);
+
+    if (axios.isAxiosError(error)) {
+      console.error(
+        "API Error Details:",
+        error.response?.data || error.message
+      );
+
+      // Check if we need to retry with a fallback - using optional chaining
+      if (
+        error.code === "ECONNABORTED" ||
+        error.response?.status === 429 ||
+        (error.response?.status ?? 0) >= 500
+      ) {
+        console.log("API error encountered, using fallback generator");
+        return generateFallbackItinerary(input);
+      }
+    }
+
+    // Use fallback for all errors
+    console.log("Unknown error, using fallback generator");
+    return generateFallbackItinerary(input);
+  }
+}
+
+// Fallback function to generate a placeholder itinerary when the API fails
+async function generateFallbackItinerary(
   input: ItineraryInput
 ): Promise<Itinerary> {
   const { destination, startDate, endDate, budget, interests } = input;
 
-  // Create a placeholder itinerary without calling the API
+  // Create a placeholder itinerary
   const placeholderItinerary: Itinerary = {
     destination: destination,
     startDate: startDate,
