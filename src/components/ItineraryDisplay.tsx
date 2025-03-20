@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Itinerary, DayPlan, Activity } from "../types/itinerary";
 import { format } from "date-fns";
 
@@ -7,108 +7,106 @@ interface ItineraryDisplayProps {
 }
 
 const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
-  const headerStyle = {
-    backgroundColor: "var(--primary-600)",
-    color: "white",
-    padding: "1rem 1.5rem",
-  };
-
-  const textLightStyle = {
-    color: "var(--primary-100)",
-  };
+  const [selectedDay, setSelectedDay] = useState(1);
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div style={headerStyle}>
-        <h2 className="text-2xl font-bold">
-          {itinerary.destination} Itinerary
-        </h2>
-        <p style={textLightStyle}>
-          {itinerary.startDate} to {itinerary.endDate}
-        </p>
+    <div className="max-w-4xl mx-auto bg-white">
+      {/* Header */}
+      <div className="bg-blue-500 text-white p-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2">
+            {itinerary.destination} Itinerary
+          </h1>
+          <p className="text-lg">
+            {itinerary.startDate} to {itinerary.endDate}
+          </p>
+        </div>
       </div>
 
       <div className="p-6">
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Overview</h3>
-          <p className="text-gray-600">{itinerary.overview}</p>
-        </div>
+        {/* Overview Section */}
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Overview</h2>
+          <p className="text-gray-700 text-lg">{itinerary.overview}</p>
+        </section>
 
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
-            Daily Itinerary
-          </h3>
+        {/* Daily Itinerary Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Daily Itinerary</h2>
 
-          {itinerary.days.length > 0 ? (
-            <div className="space-y-6">
-              {itinerary.days.map((day) => (
-                <DayCard key={day.day} day={day} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No daily plan available</p>
-          )}
-        </div>
+          {/* Day Selector */}
+          <div className="flex gap-4 mb-6">
+            {itinerary.days.map((day) => (
+              <button
+                key={day.day}
+                onClick={() => setSelectedDay(day.day)}
+                className={`px-4 py-2 rounded-md ${
+                  selectedDay === day.day
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Day {day.day}
+                <span className="block text-sm">{day.date}</span>
+              </button>
+            ))}
+          </div>
 
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Travel Tips
-          </h3>
-          {itinerary.tips.length > 0 ? (
-            <ul className="list-disc pl-5 space-y-1">
-              {itinerary.tips.map((tip, index) => (
-                <li key={index} className="text-gray-600">
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">No tips available</p>
-          )}
-        </div>
+          {/* Selected Day's Activities */}
+          {itinerary.days
+            .filter((day) => day.day === selectedDay)
+            .map((day) => (
+              <div key={day.day} className="space-y-6">
+                <h3 className="text-xl font-bold mb-4">
+                  Day {day.day}: {day.date}
+                </h3>
+                <div className="space-y-6">
+                  {day.activities.map((activity, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h4 className="text-xl font-semibold text-gray-900">
+                            {activity.name}
+                          </h4>
+                          <p className="text-gray-600 mt-1">
+                            {activity.description}
+                          </p>
+                        </div>
+                        <span className="text-gray-500">
+                          {activity.estimatedTime}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>Location: {activity.location}</span>
+                        <span>Cost: {activity.cost}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+        </section>
 
-        <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Budget Consideration
-          </h3>
-          <p className="text-gray-600">{itinerary.budget}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
+        {/* Tips Section */}
+        <section className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Travel Tips</h2>
+          <ul className="list-disc pl-5 space-y-2">
+            {itinerary.tips.map((tip, index) => (
+              <li key={index} className="text-gray-700">
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-const DayCard: React.FC<{ day: DayPlan }> = ({ day }) => {
-  return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
-      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-        <h4 className="font-medium text-gray-800">
-          Day {day.day}: {day.date}
-        </h4>
-      </div>
-
-      <div className="divide-y divide-gray-200">
-        {day.activities.map((activity, index) => (
-          <ActivityItem key={index} activity={activity} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const ActivityItem: React.FC<{ activity: Activity }> = ({ activity }) => {
-  return (
-    <div className="p-4">
-      <div className="flex justify-between">
-        <h5 className="font-medium text-gray-800">{activity.name}</h5>
-        <span className="text-sm text-gray-500">{activity.estimatedTime}</span>
-      </div>
-
-      <p className="text-gray-600 mt-1">{activity.description}</p>
-
-      <div className="flex justify-between mt-2 text-sm">
-        <span className="text-gray-500">Location: {activity.location}</span>
-        <span className="text-gray-500">Cost: {activity.cost}</span>
+        {/* Budget Section */}
+        <section className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Budget Consideration</h2>
+          <p className="text-gray-700">{itinerary.budget}</p>
+        </section>
       </div>
     </div>
   );
