@@ -30,7 +30,6 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
     budget: "",
     interests: [],
     additionalInfo: "",
-    isScheduled: false,
   });
 
   const handleChange = (
@@ -38,11 +37,10 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]: value,
     }));
   };
 
@@ -75,7 +73,6 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
       budget: "",
       interests: [],
       additionalInfo: "",
-      isScheduled: false,
     });
   };
 
