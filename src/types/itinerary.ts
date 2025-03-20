@@ -6,24 +6,26 @@ export interface ItineraryInput {
   interests: string[];
   userId?: string | null;
   additionalInfo?: string;
-  isScheduled?: boolean;
 }
 
 export interface Activity {
+  id: string;
   name: string;
+  type: "hotel" | "restaurant" | "attraction" | "transportation";
   description: string;
-  time?: string;
-  estimatedTime: string;
-  cost: string;
+  time: string;
   location: string;
+  cost: string;
+  estimatedTime: string;
+  tags: string[];
 }
 
 export interface DayPlan {
   day: number;
   date: string;
+  startTime: string;
+  endTime: string;
   activities: Activity[];
-  startTime?: string;
-  endTime?: string;
 }
 
 export interface Itinerary {

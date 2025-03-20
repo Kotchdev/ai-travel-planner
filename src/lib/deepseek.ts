@@ -15,11 +15,8 @@ export function generatePrompt(input: ItineraryInput): string {
 
   // Personalized introduction based on user ID
   const intro = userId
-    ? "Create a personalized travel itinerary based on this user's preferences and past activity."
-    : "Create a detailed travel itinerary for a new user.";
-
-  // Format interests for prompt
-  const interestsText = interests.join(", ");
+    ? "You are an expert travel planner creating a personalized itinerary for a user with specific preferences."
+    : "You are an expert travel planner.";
 
   // Budget-specific instructions
   const budgetInstructions =
@@ -32,47 +29,48 @@ export function generatePrompt(input: ItineraryInput): string {
   // Schedule preferences text
   const schedulePreferences = additionalInfo
     ? `\nSCHEDULE PREFERENCES: ${additionalInfo}\nPlease adjust the daily schedules according to these timing preferences.`
-    : "\nPlease create a detailed schedule with specific times for each activity.";
+    : "";
 
-  // Generate the prompt
   return `${intro}
-  
-DESTINATION: ${destination}
-DATES: ${startDate} to ${endDate}
-BUDGET LEVEL: ${budget}${budgetInstructions}
-INTERESTS: ${interestsText}${schedulePreferences}
 
-Create a comprehensive travel itinerary with SPECIFIC details:
+Create a detailed travel itinerary for a trip to ${destination} 
+from ${startDate} to ${endDate} with a ${budget} budget.${budgetInstructions}
 
-1. Overview:
-   - Brief but specific overview of the destination
-   - Mention actual neighborhoods or districts that will be visited
-   - Include relevant seasonal information for the given dates
+The traveler is interested in: ${interests.join(", ")}.
+${schedulePreferences}
+${
+  userId
+    ? "\nThis user has used your service before and prefers their itineraries to include their selected interests and budget preferences. Please prioritize these preferences in your recommendations."
+    : ""
+}
 
-2. Day-by-day activities with EXACT locations and establishments:
-   - Specific time for each activity (e.g., "09:00 AM - The Louvre Museum")
-   - Full names of attractions, restaurants, and venues
-   - Exact addresses or notable landmarks for each location
-   - Realistic duration for each activity including travel time
-   - Specific costs in local currency or USD (e.g., "€15 entrance fee" not just "entrance fee")
-   - For restaurants, name actual establishments that match the budget level
-   - For attractions, include specific exhibits or highlights to see
+For each day, provide a detailed schedule including:
+1. Morning activities with specific venues and times:
+   - Breakfast recommendations at actual restaurants
+   - Morning attractions or activities
+2. Lunch recommendations at specific restaurants
+3. Afternoon activities with exact locations
+4. Dinner recommendations at budget-appropriate restaurants
+5. Evening activities or entertainment options
 
-3. Budget-Appropriate Recommendations:
-   ${
-     budget === "Luxury"
-       ? "- Focus on Michelin-starred restaurants, 5-star hotels, and exclusive experiences\n   - Include VIP tours and premium services\n   - Suggest high-end shopping venues and luxury brands\n   - Recommend exclusive or private transportation options"
-       : budget === "Budget"
-       ? "- Prioritize free walking tours and public spaces\n   - Include affordable local eateries and street food\n   - Focus on budget accommodation options\n   - Suggest money-saving travel passes or cards"
-       : "- Mix of moderate restaurants and casual dining\n   - Include both paid attractions and free activities\n   - Suggest comfortable mid-range hotels\n   - Balance public transport with occasional taxis"
-   }
+For EACH activity, you MUST include:
+- Specific venue name (e.g., "The Louvre Museum" not just "museum")
+- Exact location or address
+- Detailed description including what to see/do
+- Precise costs in local currency
+- Realistic duration including travel time
+- Type of activity (hotel, restaurant, attraction, transportation)
+- Relevant tags (e.g., "art", "history", "fine-dining")
 
-4. Practical Tips:
-   - Specific transportation advice between locations
-   - Local customs and etiquette
-   - Money-saving strategies appropriate for the budget level
-   - Safety tips for specific areas
-   - Best times to visit each attraction
+IMPORTANT REQUIREMENTS:
+1. All venues must be real places that exist
+2. All costs must be accurate and current
+3. All times must be realistic including travel time
+4. All activities must match the budget level
+5. Activities should align with the user's interests
+6. Include specific exhibits, dishes, or experiences at each venue
+7. Consider opening hours and seasonal availability
+8. Add transportation details between venues
 
 The response MUST be in valid JSON format with this structure:
 {
@@ -88,12 +86,15 @@ The response MUST be in valid JSON format with this structure:
       "endTime": "10:00 PM",
       "activities": [
         {
+          "id": "unique_id",
           "name": "Full Name of Venue/Activity",
+          "type": "hotel|restaurant|attraction|transportation",
           "time": "09:00 AM",
           "description": "Detailed description with specific highlights",
           "estimatedTime": "2 hours (including 15 min travel time)",
-          "cost": "Exact cost in local currency or USD",
-          "location": "Full address or specific location details"
+          "cost": "Exact cost in local currency",
+          "location": "Full address or specific location details",
+          "tags": ["tag1", "tag2"]
         }
       ]
     }
@@ -234,100 +235,110 @@ export async function generateFallbackItinerary(
       case "Luxury":
         return {
           morning: {
+            id: "luxury-morning-tour",
             name: "Private City Tour with Expert Guide",
+            type: "attraction",
             time: "09:00 AM",
             description: `Exclusive guided tour of ${destination}'s highlights with a certified historian, including skip-the-line access to major attractions`,
             estimatedTime: "3 hours",
             cost: "$300 per person",
             location: "Hotel Pickup Service",
+            tags: ["luxury", "guided-tour", "private"],
           },
           lunch: {
-            name:
-              budget === "Luxury"
-                ? "Michelin-Starred Dining Experience"
-                : "Local Restaurant",
+            id: "luxury-lunch",
+            name: "Michelin-Starred Dining Experience",
+            type: "restaurant",
             time: "12:30 PM",
             description:
-              budget === "Luxury"
-                ? "Exquisite tasting menu at a prestigious Michelin-starred restaurant"
-                : "Traditional local cuisine",
+              "Exquisite tasting menu at a prestigious Michelin-starred restaurant",
             estimatedTime: "2 hours",
-            cost:
-              budget === "Luxury" ? "$200-300 per person" : "$30-50 per person",
-            location:
-              budget === "Luxury" ? "Fine Dining District" : "City Center",
+            cost: "$200-300 per person",
+            location: "Fine Dining District",
+            tags: ["luxury", "fine-dining", "michelin-star"],
           },
           afternoon: {
-            name:
-              budget === "Luxury" ? "VIP Shopping Experience" : "Cultural Tour",
+            id: "luxury-shopping",
+            name: "VIP Shopping Experience",
+            type: "attraction",
             time: "03:00 PM",
-            description:
-              budget === "Luxury"
-                ? "Personal shopping assistant at luxury boutiques"
-                : "Visit to main cultural sites",
+            description: "Personal shopping assistant at luxury boutiques",
             estimatedTime: "3 hours",
-            cost:
-              budget === "Luxury"
-                ? "Variable (luxury goods)"
-                : "$20-40 entrance fees",
-            location:
-              budget === "Luxury"
-                ? "Premium Shopping District"
-                : "Historic District",
+            cost: "Variable (luxury goods)",
+            location: "Premium Shopping District",
+            tags: ["luxury", "shopping", "vip-service"],
           },
         };
       case "Budget":
         return {
           morning: {
+            id: "budget-morning-tour",
             name: "Free Walking Tour",
+            type: "attraction",
             time: "09:00 AM",
             description: `Explore ${destination}'s highlights with a local guide (tip-based)`,
             estimatedTime: "2.5 hours",
             cost: "Free (suggested tip: $10-15)",
             location: "Main Square Meeting Point",
+            tags: ["budget", "walking-tour", "guided"],
           },
           lunch: {
+            id: "budget-lunch",
             name: "Local Street Food Experience",
+            type: "restaurant",
             time: "12:00 PM",
             description: "Sample authentic street food from local vendors",
             estimatedTime: "1 hour",
             cost: "$5-10 per person",
             location: "Food Market District",
+            tags: ["budget", "local-food", "street-food"],
           },
           afternoon: {
+            id: "budget-museum",
             name: "Self-Guided Museum Tour",
+            type: "attraction",
             time: "02:00 PM",
             description: "Visit during free/reduced admission hours",
             estimatedTime: "2 hours",
             cost: "Free - $10",
             location: "City Museum",
+            tags: ["budget", "culture", "self-guided"],
           },
         };
       default: // Moderate
         return {
           morning: {
+            id: "moderate-morning-tour",
             name: "Guided Group Tour",
+            type: "attraction",
             time: "09:30 AM",
             description: `Comprehensive tour of ${destination}'s main attractions`,
             estimatedTime: "2.5 hours",
             cost: "$45 per person",
             location: "Tourist Information Center",
+            tags: ["moderate", "guided-tour", "group"],
           },
           lunch: {
+            id: "moderate-lunch",
             name: "Mid-Range Restaurant Experience",
+            type: "restaurant",
             time: "12:30 PM",
             description: "Quality local cuisine in a comfortable setting",
             estimatedTime: "1.5 hours",
             cost: "$25-40 per person",
             location: "Restaurant District",
+            tags: ["moderate", "local-food", "casual-dining"],
           },
           afternoon: {
+            id: "moderate-cultural",
             name: "Cultural Site Visit",
+            type: "attraction",
             time: "02:30 PM",
             description: "Explore major cultural attractions",
             estimatedTime: "2 hours",
             cost: "$20-30 entrance fee",
             location: "Historic Center",
+            tags: ["moderate", "culture", "history"],
           },
         };
     }
