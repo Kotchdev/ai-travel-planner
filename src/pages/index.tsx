@@ -12,6 +12,7 @@ export default function HomePage() {
   const handleSubmit = async (data: ItineraryInput) => {
     setIsLoading(true);
     setError(null);
+    setItinerary(null); // Reset itinerary before generating a new one
 
     try {
       const response = await fetch("/api/generate-itinerary", {
@@ -39,6 +40,11 @@ export default function HomePage() {
     }
   };
 
+  const handleReset = () => {
+    setItinerary(null);
+    setError(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Head>
@@ -62,7 +68,18 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <ItineraryForm onSubmit={handleSubmit} isLoading={isLoading} />
+            {!isLoading && itinerary ? (
+              <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                <button
+                  onClick={handleReset}
+                  className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors"
+                >
+                  Plan Another Trip
+                </button>
+              </div>
+            ) : (
+              <ItineraryForm onSubmit={handleSubmit} isLoading={isLoading} />
+            )}
           </div>
 
           <div>
