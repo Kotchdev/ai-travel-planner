@@ -118,9 +118,9 @@ export async function generateItinerary(
     }
 
     const response = await axios.post(
-      "https://api.deepseek.com/v1/chat/completions",
+      "https://api.deepinfra.com/v1/openai/chat/completions",
       {
-        model: "deepseek-chat",
+        model: "deepseek-coder-33b-instruct",
         messages: [
           {
             role: "system",
@@ -132,16 +132,15 @@ export async function generateItinerary(
             content: prompt,
           },
         ],
-        temperature: 0.5,
-        max_tokens: 2000,
-        response_format: { type: "json_object" },
+        temperature: 0.7,
+        max_tokens: 4000,
       },
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
         },
-        timeout: 30000, // 30 second timeout
+        timeout: 60000, // 60 second timeout
       }
     );
 
