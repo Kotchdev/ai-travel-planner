@@ -8,11 +8,12 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(true);
 
   const handleSubmit = async (data: ItineraryInput) => {
     setIsLoading(true);
     setError(null);
-    setItinerary(null); // Reset itinerary before generating a new one
+    setShowForm(false);
 
     try {
       const response = await fetch("/api/generate-itinerary", {
@@ -35,6 +36,7 @@ export default function HomePage() {
         err instanceof Error ? err.message : "An unknown error occurred"
       );
       console.error("Error generating itinerary:", err);
+      setShowForm(true);
     } finally {
       setIsLoading(false);
     }
@@ -43,6 +45,7 @@ export default function HomePage() {
   const handleReset = () => {
     setItinerary(null);
     setError(null);
+    setShowForm(true);
   };
 
   return (
@@ -68,7 +71,7 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            {!isLoading && itinerary ? (
+            {!isLoading && itinerary && !showForm ? (
               <div className="bg-white p-6 rounded-lg shadow-md mb-4">
                 <button
                   onClick={handleReset}
