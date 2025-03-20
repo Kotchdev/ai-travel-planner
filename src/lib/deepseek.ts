@@ -3,7 +3,16 @@ import axios from "axios";
 
 // Generate a prompt for the DeepSeek API
 export function generatePrompt(input: ItineraryInput): string {
-  const { destination, startDate, endDate, budget, interests, userId } = input;
+  const {
+    destination,
+    startDate,
+    endDate,
+    budget,
+    interests,
+    userId,
+    additionalInfo,
+    isScheduled,
+  } = input;
 
   // Personalized introduction based on user ID
   const intro = userId
@@ -13,19 +22,29 @@ export function generatePrompt(input: ItineraryInput): string {
   // Format interests for prompt
   const interestsText = interests.join(", ");
 
+  // Additional preferences text
+  const additionalPreferences = additionalInfo
+    ? `\nADDITIONAL PREFERENCES: ${additionalInfo}`
+    : "";
+
+  // Schedule format instruction
+  const scheduleInstruction = isScheduled
+    ? "\nPlease include specific times for each activity in the schedule (e.g., '9:00 AM - City Tour')."
+    : "";
+
   // Generate the prompt
   return `${intro}
   
 DESTINATION: ${destination}
 DATES: ${startDate} to ${endDate}
 BUDGET: ${budget}
-INTERESTS: ${interestsText}
+INTERESTS: ${interestsText}${additionalPreferences}${scheduleInstruction}
 
 Please create a comprehensive travel itinerary with the following:
 1. A brief overview of the destination (2-3 sentences)
 2. Day-by-day activities, including:
-   - Attractions to visit
-   - Estimated time for each activity
+   - ${isScheduled ? "Specific time and " : ""}Attractions to visit
+   - Estimated duration for each activity
    - Approximate cost
    - Locations
 3. Practical travel tips for the destination
@@ -43,7 +62,7 @@ The response MUST be in valid JSON format with this structure:
       "date": "YYYY-MM-DD",
       "activities": [
         {
-          "name": "Activity name",
+          "name": "${isScheduled ? "9:00 AM - " : ""}Activity name",
           "description": "Brief description",
           "estimatedTime": "X hours",
           "cost": "Cost in local currency or USD",

@@ -29,15 +29,20 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
     endDate: "",
     budget: "",
     interests: [],
+    additionalInfo: "",
+    isScheduled: false,
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]:
+        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -184,6 +189,40 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
                 </label>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="additionalInfo"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Additional Information
+          </label>
+          <textarea
+            id="additionalInfo"
+            name="additionalInfo"
+            value={formData.additionalInfo}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            rows={3}
+            placeholder="Any specific preferences or requirements? (optional)"
+          />
+        </div>
+
+        <div className="mb-4">
+          <div className="flex items-center">
+            <input
+              id="isScheduled"
+              name="isScheduled"
+              type="checkbox"
+              checked={formData.isScheduled}
+              onChange={handleChange}
+              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label htmlFor="isScheduled" className="ml-2 text-sm text-gray-700">
+              Create a detailed schedule with specific times
+            </label>
           </div>
         </div>
 

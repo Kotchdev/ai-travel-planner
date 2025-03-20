@@ -5,6 +5,8 @@ export interface ItineraryInput {
   budget: string;
   interests: string[];
   userId?: string | null;
+  additionalInfo?: string;
+  isScheduled?: boolean;
 }
 
 export interface Activity {
