@@ -67,6 +67,16 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+    // Reset form after submission
+    setFormData({
+      destination: "",
+      startDate: "",
+      endDate: "",
+      budget: "",
+      interests: [],
+      additionalInfo: "",
+      isScheduled: false,
+    });
   };
 
   const buttonStyle = {
@@ -197,7 +207,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
             htmlFor="additionalInfo"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Additional Information
+            Schedule Preferences
           </label>
           <textarea
             id="additionalInfo"
@@ -206,24 +216,8 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             rows={3}
-            placeholder="Any specific preferences or requirements? (optional)"
+            placeholder="Specify any timing preferences (e.g., 'Start at 3 PM on day 2', 'Free morning on day 1', 'Prefer early dinners around 6 PM')"
           />
-        </div>
-
-        <div className="mb-4">
-          <div className="flex items-center">
-            <input
-              id="isScheduled"
-              name="isScheduled"
-              type="checkbox"
-              checked={formData.isScheduled}
-              onChange={handleChange}
-              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-            />
-            <label htmlFor="isScheduled" className="ml-2 text-sm text-gray-700">
-              Create a detailed schedule with specific times
-            </label>
-          </div>
         </div>
 
         <button

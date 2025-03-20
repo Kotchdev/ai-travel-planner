@@ -11,7 +11,6 @@ export function generatePrompt(input: ItineraryInput): string {
     interests,
     userId,
     additionalInfo,
-    isScheduled,
   } = input;
 
   // Personalized introduction based on user ID
@@ -22,15 +21,10 @@ export function generatePrompt(input: ItineraryInput): string {
   // Format interests for prompt
   const interestsText = interests.join(", ");
 
-  // Additional preferences text
-  const additionalPreferences = additionalInfo
-    ? `\nADDITIONAL PREFERENCES: ${additionalInfo}`
-    : "";
-
-  // Schedule format instruction
-  const scheduleInstruction = isScheduled
-    ? "\nPlease include specific times for each activity in the schedule (e.g., '9:00 AM - City Tour')."
-    : "";
+  // Schedule preferences text
+  const schedulePreferences = additionalInfo
+    ? `\nSCHEDULE PREFERENCES: ${additionalInfo}\nPlease adjust the daily schedules according to these timing preferences.`
+    : "\nPlease create a detailed schedule with specific times for each activity.";
 
   // Generate the prompt
   return `${intro}
@@ -38,17 +32,24 @@ export function generatePrompt(input: ItineraryInput): string {
 DESTINATION: ${destination}
 DATES: ${startDate} to ${endDate}
 BUDGET: ${budget}
-INTERESTS: ${interestsText}${additionalPreferences}${scheduleInstruction}
+INTERESTS: ${interestsText}${schedulePreferences}
 
 Please create a comprehensive travel itinerary with the following:
 1. A brief overview of the destination (2-3 sentences)
-2. Day-by-day activities, including:
-   - ${isScheduled ? "Specific time and " : ""}Attractions to visit
-   - Estimated duration for each activity
+2. Day-by-day activities, with specific times for each activity, including:
+   - Time and activity name (e.g., "09:00 AM - City Tour")
+   - Estimated duration
    - Approximate cost
    - Locations
 3. Practical travel tips for the destination
 4. Budget considerations
+
+IMPORTANT: 
+- Always include specific times for each activity
+- Respect any timing preferences provided by the user
+- Allow reasonable time for travel between locations
+- Include breaks for rest and flexibility
+- Consider typical opening hours of attractions
 
 The response MUST be in valid JSON format with this structure:
 {
@@ -60,11 +61,14 @@ The response MUST be in valid JSON format with this structure:
     {
       "day": 1,
       "date": "YYYY-MM-DD",
+      "startTime": "09:00 AM",
+      "endTime": "10:00 PM",
       "activities": [
         {
-          "name": "${isScheduled ? "9:00 AM - " : ""}Activity name",
+          "name": "Activity name",
+          "time": "09:00 AM",
           "description": "Brief description",
-          "estimatedTime": "X hours",
+          "estimatedTime": "2 hours",
           "cost": "Cost in local currency or USD",
           "location": "Location within the city"
         }
@@ -201,7 +205,7 @@ export async function generateFallbackItinerary(
 ): Promise<Itinerary> {
   const { destination, startDate, endDate, budget, interests } = input;
 
-  // Create a placeholder itinerary
+  // Create a placeholder itinerary with times
   const placeholderItinerary: Itinerary = {
     destination: destination,
     startDate: startDate,
@@ -214,9 +218,12 @@ export async function generateFallbackItinerary(
       {
         day: 1,
         date: startDate,
+        startTime: "09:00 AM",
+        endTime: "09:00 PM",
         activities: [
           {
             name: "Morning City Tour",
+            time: "09:00 AM",
             description: `Explore the historic center of ${destination}`,
             estimatedTime: "3 hours",
             cost: "Free - $30",
@@ -224,6 +231,7 @@ export async function generateFallbackItinerary(
           },
           {
             name: "Local Cuisine Experience",
+            time: "12:30 PM",
             description: "Try the famous local dishes for lunch",
             estimatedTime: "1.5 hours",
             cost: "$20 - $40",
@@ -231,6 +239,7 @@ export async function generateFallbackItinerary(
           },
           {
             name: "Museum Visit",
+            time: "02:30 PM",
             description: `Visit the main ${destination} museum`,
             estimatedTime: "2 hours",
             cost: "$15",
@@ -241,9 +250,12 @@ export async function generateFallbackItinerary(
       {
         day: 2,
         date: endDate,
+        startTime: "09:00 AM",
+        endTime: "09:00 PM",
         activities: [
           {
             name: "Nature Excursion",
+            time: "09:00 AM",
             description: `Explore the natural beauty around ${destination}`,
             estimatedTime: "4 hours",
             cost: "$25 - $50",
@@ -251,6 +263,7 @@ export async function generateFallbackItinerary(
           },
           {
             name: "Shopping Time",
+            time: "02:00 PM",
             description: "Visit local markets and shops",
             estimatedTime: "2 hours",
             cost: "Varies",
@@ -258,6 +271,7 @@ export async function generateFallbackItinerary(
           },
           {
             name: "Farewell Dinner",
+            time: "07:00 PM",
             description: "Enjoy a nice dinner at a recommended restaurant",
             estimatedTime: "2 hours",
             cost: "$30 - $60",

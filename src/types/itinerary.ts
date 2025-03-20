@@ -12,6 +12,7 @@ export interface ItineraryInput {
 export interface Activity {
   name: string;
   description: string;
+  time?: string;
   estimatedTime: string;
   cost: string;
   location: string;
@@ -21,6 +22,8 @@ export interface DayPlan {
   day: number;
   date: string;
   activities: Activity[];
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface Itinerary {
