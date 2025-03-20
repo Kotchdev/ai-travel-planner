@@ -76,19 +76,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
     });
   };
 
-  const buttonStyle = {
-    width: "100%",
-    padding: "0.5rem 1rem",
-    borderRadius: "0.375rem",
-    fontWeight: 500,
-    backgroundColor:
-      isLoading || formData.interests.length === 0 ? "#93c5fd" : "#0284c7",
-    color: "white",
-    border: "none",
-    cursor:
-      isLoading || formData.interests.length === 0 ? "not-allowed" : "pointer",
-    opacity: isLoading || formData.interests.length === 0 ? 0.5 : 1,
-  };
+  const isDisabled = isLoading || formData.interests.length === 0;
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
@@ -109,7 +97,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
             required
             value={formData.destination}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="form-input"
             placeholder="e.g. Paris, France"
           />
         </div>
@@ -129,7 +117,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
               required
               value={formData.startDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="form-input"
             />
           </div>
 
@@ -147,7 +135,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
               required
               value={formData.endDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="form-input"
             />
           </div>
         </div>
@@ -165,7 +153,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
             required
             value={formData.budget}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="form-input"
           >
             <option value="">Select your budget</option>
             <option value="Budget">Budget</option>
@@ -178,19 +166,19 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
           <span className="block text-sm font-medium text-gray-700 mb-2">
             Interests (select at least one)
           </span>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="interest-grid">
             {DEFAULT_INTERESTS.map((interest) => (
-              <div key={interest} className="flex items-center">
+              <div key={interest} className="interest-item">
                 <input
                   id={`interest-${interest}`}
                   type="checkbox"
                   checked={formData.interests.includes(interest)}
                   onChange={() => handleInterestChange(interest)}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="interest-checkbox"
                 />
                 <label
                   htmlFor={`interest-${interest}`}
-                  className="ml-2 text-sm text-gray-700"
+                  className="interest-label"
                 >
                   {interest}
                 </label>
@@ -211,7 +199,7 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
             name="additionalInfo"
             value={formData.additionalInfo}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="form-input"
             rows={3}
             placeholder="Specify any timing preferences (e.g., 'Start at 3 PM on day 2', 'Free morning on day 1', 'Prefer early dinners around 6 PM')"
           />
@@ -219,8 +207,10 @@ const ItineraryForm: React.FC<ItineraryFormProps> = ({
 
         <button
           type="submit"
-          disabled={isLoading || formData.interests.length === 0}
-          style={buttonStyle}
+          disabled={isDisabled}
+          className={`btn-primary ${
+            isDisabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           {isLoading ? "Generating Itinerary..." : "Generate Itinerary"}
         </button>
