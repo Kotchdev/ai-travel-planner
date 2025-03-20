@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { generateItinerary } from "../../lib/deepseek";
+import {
+  generateItinerary,
+  generateFallbackItinerary,
+} from "../../lib/deepseek";
 import { ItineraryInput, Itinerary } from "../../types/itinerary";
 
 export default async function handler(
@@ -37,16 +40,24 @@ export default async function handler(
       interests: interests.join(", "),
     });
 
-    // Generate itinerary
-    const itinerary = await generateItinerary(itineraryInput);
+    try {
+      // Try to generate itinerary with DeepSeek
+      const itinerary = await generateItinerary(itineraryInput);
 
-    // Validate the returned itinerary
-    if (!itinerary.destination || itinerary.destination === "Unknown") {
-      console.warn("Generated itinerary may be incomplete:", itinerary);
+      // Validate the returned itinerary
+      if (!itinerary.destination || itinerary.destination === "Unknown") {
+        console.warn("Generated itinerary may be incomplete:", itinerary);
+      }
+
+      // Return the generated itinerary
+      return res.status(200).json(itinerary);
+    } catch (apiError) {
+      console.error("Error with DeepSeek API, using fallback:", apiError);
+
+      // Use fallback if DeepSeek fails
+      const fallbackItinerary = await generateFallbackItinerary(itineraryInput);
+      return res.status(200).json(fallbackItinerary);
     }
-
-    // Return the generated itinerary
-    return res.status(200).json(itinerary);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";

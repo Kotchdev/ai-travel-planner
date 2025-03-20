@@ -178,7 +178,7 @@ export async function generateItinerary(
 }
 
 // Fallback function to generate a placeholder itinerary when the API fails
-async function generateFallbackItinerary(
+export async function generateFallbackItinerary(
   input: ItineraryInput
 ): Promise<Itinerary> {
   const { destination, startDate, endDate, budget, interests } = input;
