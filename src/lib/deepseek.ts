@@ -237,7 +237,7 @@ export async function generateFallbackItinerary(
           morning: {
             id: "luxury-morning-tour",
             name: "Private City Tour with Expert Guide",
-            type: "attraction",
+            type: "attraction" as const,
             time: "09:00 AM",
             description: `Exclusive guided tour of ${destination}'s highlights with a certified historian, including skip-the-line access to major attractions`,
             estimatedTime: "3 hours",
@@ -248,7 +248,7 @@ export async function generateFallbackItinerary(
           lunch: {
             id: "luxury-lunch",
             name: "Michelin-Starred Dining Experience",
-            type: "restaurant",
+            type: "restaurant" as const,
             time: "12:30 PM",
             description:
               "Exquisite tasting menu at a prestigious Michelin-starred restaurant",
@@ -260,7 +260,7 @@ export async function generateFallbackItinerary(
           afternoon: {
             id: "luxury-shopping",
             name: "VIP Shopping Experience",
-            type: "attraction",
+            type: "attraction" as const,
             time: "03:00 PM",
             description: "Personal shopping assistant at luxury boutiques",
             estimatedTime: "3 hours",
@@ -274,7 +274,7 @@ export async function generateFallbackItinerary(
           morning: {
             id: "budget-morning-tour",
             name: "Free Walking Tour",
-            type: "attraction",
+            type: "attraction" as const,
             time: "09:00 AM",
             description: `Explore ${destination}'s highlights with a local guide (tip-based)`,
             estimatedTime: "2.5 hours",
@@ -285,7 +285,7 @@ export async function generateFallbackItinerary(
           lunch: {
             id: "budget-lunch",
             name: "Local Street Food Experience",
-            type: "restaurant",
+            type: "restaurant" as const,
             time: "12:00 PM",
             description: "Sample authentic street food from local vendors",
             estimatedTime: "1 hour",
@@ -296,7 +296,7 @@ export async function generateFallbackItinerary(
           afternoon: {
             id: "budget-museum",
             name: "Self-Guided Museum Tour",
-            type: "attraction",
+            type: "attraction" as const,
             time: "02:00 PM",
             description: "Visit during free/reduced admission hours",
             estimatedTime: "2 hours",
@@ -310,7 +310,7 @@ export async function generateFallbackItinerary(
           morning: {
             id: "moderate-morning-tour",
             name: "Guided Group Tour",
-            type: "attraction",
+            type: "attraction" as const,
             time: "09:30 AM",
             description: `Comprehensive tour of ${destination}'s main attractions`,
             estimatedTime: "2.5 hours",
@@ -321,7 +321,7 @@ export async function generateFallbackItinerary(
           lunch: {
             id: "moderate-lunch",
             name: "Mid-Range Restaurant Experience",
-            type: "restaurant",
+            type: "restaurant" as const,
             time: "12:30 PM",
             description: "Quality local cuisine in a comfortable setting",
             estimatedTime: "1.5 hours",
@@ -332,7 +332,7 @@ export async function generateFallbackItinerary(
           afternoon: {
             id: "moderate-cultural",
             name: "Cultural Site Visit",
-            type: "attraction",
+            type: "attraction" as const,
             time: "02:30 PM",
             description: "Explore major cultural attractions",
             estimatedTime: "2 hours",
