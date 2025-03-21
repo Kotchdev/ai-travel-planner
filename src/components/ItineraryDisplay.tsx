@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Itinerary } from '../types/itinerary';
 
 interface ItineraryDisplayProps {
-  itinerary: Itinerary;
+  itinerary: Itinerary & {
+    budget_breakdown?: {
+      accommodation: string;
+      activities: string;
+      food: string;
+      transportation: string;
+      total: string;
+    };
+  };
 }
 
 const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
