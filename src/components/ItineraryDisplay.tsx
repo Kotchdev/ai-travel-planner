@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Itinerary } from '../types/itinerary';
+import { Itinerary, BudgetBreakdown } from '../types/itinerary';
 
 interface ItineraryDisplayProps {
   itinerary: Itinerary;
@@ -7,6 +7,7 @@ interface ItineraryDisplayProps {
 
 const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const budgetBreakdown = itinerary.budget_breakdown as BudgetBreakdown | undefined;
 
   return (
     <div className="max-w-4xl mx-auto bg-white">
@@ -84,24 +85,24 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
           </ul>
         </section>
 
-        {itinerary.budget_breakdown && (
+        {budgetBreakdown && (
           <section className="mt-8">
             <h2 className="text-2xl font-bold mb-4">Budget Breakdown</h2>
             <div className="space-y-2">
               <p className="text-gray-700">
-                Accommodation: {itinerary.budget_breakdown.accommodation}
+                Accommodation: {budgetBreakdown.accommodation}
               </p>
               <p className="text-gray-700">
-                Activities: {itinerary.budget_breakdown.activities}
+                Activities: {budgetBreakdown.activities}
               </p>
               <p className="text-gray-700">
-                Food: {itinerary.budget_breakdown.food}
+                Food: {budgetBreakdown.food}
               </p>
               <p className="text-gray-700">
-                Transportation: {itinerary.budget_breakdown.transportation}
+                Transportation: {budgetBreakdown.transportation}
               </p>
               <p className="font-semibold text-gray-900">
-                Total: {itinerary.budget_breakdown.total}
+                Total: {budgetBreakdown.total}
               </p>
             </div>
           </section>
