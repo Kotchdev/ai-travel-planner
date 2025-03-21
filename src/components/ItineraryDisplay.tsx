@@ -84,26 +84,28 @@ const ItineraryDisplay: React.FC<ItineraryDisplayProps> = ({ itinerary }) => {
           </ul>
         </section>
 
-        <section className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Budget Breakdown</h2>
-          <div className="space-y-2">
-            <p className="text-gray-700">
-              Accommodation: {itinerary.budget_breakdown?.accommodation}
-            </p>
-            <p className="text-gray-700">
-              Activities: {itinerary.budget_breakdown?.activities}
-            </p>
-            <p className="text-gray-700">
-              Food: {itinerary.budget_breakdown?.food}
-            </p>
-            <p className="text-gray-700">
-              Transportation: {itinerary.budget_breakdown?.transportation}
-            </p>
-            <p className="font-semibold text-gray-900">
-              Total: {itinerary.budget_breakdown?.total}
-            </p>
-          </div>
-        </section>
+        {itinerary.budget_breakdown && (
+          <section className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Budget Breakdown</h2>
+            <div className="space-y-2">
+              <p className="text-gray-700">
+                Accommodation: {itinerary.budget_breakdown.accommodation}
+              </p>
+              <p className="text-gray-700">
+                Activities: {itinerary.budget_breakdown.activities}
+              </p>
+              <p className="text-gray-700">
+                Food: {itinerary.budget_breakdown.food}
+              </p>
+              <p className="text-gray-700">
+                Transportation: {itinerary.budget_breakdown.transportation}
+              </p>
+              <p className="font-semibold text-gray-900">
+                Total: {itinerary.budget_breakdown.total}
+              </p>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
